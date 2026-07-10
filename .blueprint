@@ -1,0 +1,68 @@
+created:
+    - app/Http/Controllers/DashboardController.php
+    - app/Http/Controllers/ClientController.php
+    - app/Http/Controllers/MatterController.php
+    - app/Http/Controllers/DocumentController.php
+    - app/Http/Controllers/TaskController.php
+    - database/factories/ClientFactory.php
+    - database/factories/MatterFactory.php
+    - database/factories/DocumentFactory.php
+    - database/factories/DocumentInsightFactory.php
+    - database/factories/TaskFactory.php
+    - database/factories/ResearchSessionFactory.php
+    - database/factories/ActivityLogFactory.php
+    - database/migrations/2026_07_10_053359_create_clients_table.php
+    - database/migrations/2026_07_10_053400_create_matters_table.php
+    - database/migrations/2026_07_10_053401_create_documents_table.php
+    - database/migrations/2026_07_10_053402_create_document_insights_table.php
+    - database/migrations/2026_07_10_053403_create_tasks_table.php
+    - database/migrations/2026_07_10_053404_create_research_sessions_table.php
+    - database/migrations/2026_07_10_053405_create_activity_logs_table.php
+    - app/Models/Client.php
+    - app/Models/Matter.php
+    - app/Models/Document.php
+    - app/Models/DocumentInsight.php
+    - app/Models/Task.php
+    - app/Models/ResearchSession.php
+    - app/Models/ActivityLog.php
+    - tests/Feature/Http/Controllers/DashboardControllerTest.php
+    - tests/Feature/Http/Controllers/ClientControllerTest.php
+    - tests/Feature/Http/Controllers/MatterControllerTest.php
+    - tests/Feature/Http/Controllers/DocumentControllerTest.php
+    - tests/Feature/Http/Controllers/TaskControllerTest.php
+    - app/Http/Requests/ClientStoreRequest.php
+    - app/Http/Requests/ClientUpdateRequest.php
+    - app/Http/Requests/MatterStoreRequest.php
+    - app/Http/Requests/MatterUpdateRequest.php
+    - app/Http/Requests/DocumentStoreRequest.php
+    - app/Http/Requests/DocumentUpdateRequest.php
+    - app/Http/Requests/TaskStoreRequest.php
+    - app/Http/Requests/TaskUpdateRequest.php
+    - resources/views/client/index.blade.php
+    - resources/views/client/create.blade.php
+    - resources/views/client/show.blade.php
+    - resources/views/client/edit.blade.php
+    - resources/views/matter/index.blade.php
+    - resources/views/matter/create.blade.php
+    - resources/views/matter/show.blade.php
+    - resources/views/matter/edit.blade.php
+    - resources/views/document/index.blade.php
+    - resources/views/document/create.blade.php
+    - resources/views/document/show.blade.php
+    - resources/views/document/edit.blade.php
+    - resources/views/task/index.blade.php
+    - resources/views/task/create.blade.php
+    - resources/views/task/show.blade.php
+    - resources/views/task/edit.blade.php
+updated:
+    - routes/web.php
+skipped:
+    - resources/views/dashboard.blade.php
+models:
+    Client: { user_id: 'id foreign:users', name: string, email: 'string nullable', phone: 'string nullable', organization: 'string nullable', address: 'text nullable', notes: 'text nullable', archived_at: 'timestamp nullable', relationships: { hasMany: Matter } }
+    Matter: { client_id: 'id foreign:clients', title: string, description: 'text nullable', practice_area: 'string nullable', status: 'enum:open,in_review,waiting_client,closed default:open', opened_at: 'timestamp nullable', closed_at: 'timestamp nullable', relationships: { hasMany: 'Document, Task, ResearchSession, ActivityLog' } }
+    Document: { matter_id: 'id foreign:matters', uploaded_by: 'id foreign:users', filename: string, original_name: string, storage_path: string, mime_type: string, file_size: integer, document_type: 'enum:contract,lease,title_deed,correspondence,research,other', extracted_text: 'longtext nullable', processing_status: 'enum:uploaded,extracting,analysis_pending,analyzed,failed default:uploaded', error_message: 'text nullable', relationships: { hasOne: DocumentInsight } }
+    DocumentInsight: { document_id: 'id foreign:documents', summary: 'text nullable', key_parties_json: 'json nullable', key_clauses_json: 'json nullable', risks_json: 'json nullable', obligations_json: 'json nullable', deadlines_json: 'json nullable', questions_json: 'json nullable', model_name: 'string nullable', raw_ai_response: 'longtext nullable' }
+    Task: { matter_id: 'id foreign:matters', source_document_id: 'id foreign:documents nullable', title: string, description: 'text nullable', due_date: 'date nullable', status: 'enum:open,in_progress,done default:open', priority: 'enum:low,medium,high default:medium', created_by: 'id foreign:users', completed_at: 'timestamp nullable' }
+    ResearchSession: { matter_id: 'id foreign:matters', user_id: 'id foreign:users', query: text, response: 'longtext nullable', sources_json: 'json nullable', model_name: 'string nullable' }
+    ActivityLog: { user_id: 'id foreign:users', matter_id: 'id foreign:matters nullable', subject_type: 'string nullable', subject_id: 'unsignedBigInteger nullable', action: string, description: string, metadata_json: 'json nullable' }
