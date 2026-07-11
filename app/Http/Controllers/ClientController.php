@@ -2,65 +2,75 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ClientStoreRequest;
-use App\Http\Requests\ClientUpdateRequest;
 use App\Models\Client;
+use App\Http\Requests\StoreClientRequest;
+use App\Http\Requests\UpdateClientRequest;
+use App\Services\ClientService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ClientController extends Controller
 {
-    public function index(Request $request): Response
-    {
-        $clients = Client::all();
+    public function __construct(
+        protected ClientService $clients,
+    ) {}
 
-        return view('client.index', [
-            'clients' => $clients,
+    /**
+     * Route: GET /clients
+     * Query: search
+     */
+    public function index(Request $request): View
+    {
+        return view('clients.index', [
+            'clients' => $this->clients->search($request->query('search')),
+            'search' => $request->query('search'),
         ]);
     }
 
-    public function create(Request $request): Response
+    public function create(): View
     {
-        return view('client.create');
+        return view('clients.create');
     }
 
-    public function store(ClientStoreRequest $request): Response
+    public function store(StoreClientRequest $request): RedirectResponse
     {
-        $client = Client::create($request->validated());
+        $client = $this->clients->create($request->validated());
 
-        $request->session()->flash('client.id', $client->id);
-
-        return redirect()->route('clients.index');
+        return redirect()
+            ->route('clients.show', $client)
+            ->with('status', 'Client created.');
     }
 
-    public function show(Request $request, Client $client): Response
+    /**
+     * Route: GET /clients/{client}
+     * Response: client, matters, recent documents (US-B1).
+     */
+    public function show(Client $client): View
     {
-        return view('client.show', [
-            'client' => $client,
-        ]);
+        return view('clients.show', $this->clients->getProfileData($client));
     }
 
-    public function edit(Request $request, Client $client): Response
+    public function edit(Client $client): View
     {
-        return view('client.edit', [
-            'client' => $client,
-        ]);
+        return view('clients.edit', ['client' => $client]);
     }
 
-    public function update(ClientUpdateRequest $request, Client $client): Response
+    public function update(UpdateClientRequest $request, Client $client): RedirectResponse
     {
-        $client->update($request->validated());
+        $this->clients->update($client, $request->validated());
 
-        $request->session()->flash('client.id', $client->id);
-
-        return redirect()->route('clients.index');
+        return redirect()
+            ->route('clients.show', $client)
+            ->with('status', 'Client updated.');
     }
 
-    public function destroy(Request $request, Client $client): Response
+    public function archive(Client $client): RedirectResponse
     {
-        $client->delete();
+        $this->clients->archive($client);
 
-        return redirect()->route('clients.index');
+        return redirect()
+            ->route('clients.index')
+            ->with('status', 'Client archived.');
     }
 }

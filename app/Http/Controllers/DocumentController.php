@@ -44,7 +44,6 @@ class DocumentController extends Controller
     public function edit(Request $request, Document $document): Response
     {
         return view('document.edit', [
-        return view('document.edit', [
             'document' => $document,
         ]);
     }

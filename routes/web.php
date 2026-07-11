@@ -7,8 +7,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -17,6 +15,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     // Clients
+    Route::patch('/clients/{client}/archive', [\App\Http\Controllers\ClientController::class, 'archive'])->name('clients.archive');
     Route::resource('clients', \App\Http\Controllers\ClientController::class);
 
     // Matters
