@@ -2,19 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DocumentInsight extends Model
 {
-    use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'document_id',
         'summary',
@@ -29,23 +21,19 @@ class DocumentInsight extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Without these casts, passing PHP arrays (from GeminiJsonParser)
+     * straight into json columns via updateOrCreate() would fail or
+     * silently store malformed data. These casts handle the array
+     * <-> JSON conversion transparently in both directions.
      */
-    protected function casts(): array
-    {
-        return [
-            'id' => 'integer',
-            'document_id' => 'integer',
-            'key_parties_json' => 'array',
-            'key_clauses_json' => 'array',
-            'risks_json' => 'array',
-            'obligations_json' => 'array',
-            'deadlines_json' => 'array',
-            'questions_json' => 'array',
-        ];
-    }
+    protected $casts = [
+        'key_parties_json' => 'array',
+        'key_clauses_json' => 'array',
+        'risks_json' => 'array',
+        'obligations_json' => 'array',
+        'deadlines_json' => 'array',
+        'questions_json' => 'array',
+    ];
 
     public function document(): BelongsTo
     {

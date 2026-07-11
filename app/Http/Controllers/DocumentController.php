@@ -6,8 +6,8 @@ use App\Models\Document;
 use App\Models\Matter;
 use App\Http\Requests\UploadDocumentRequest;
 use App\Jobs\ExtractDocumentTextJob;
+use App\Jobs\AnalyzeDocumentJob;
 use App\Services\DocumentService;
-use App\Services\AiAnalysisService;
 use App\Services\TimelineService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -16,7 +16,6 @@ class DocumentController extends Controller
 {
     public function __construct(
         protected DocumentService $documents,
-        protected AiAnalysisService $analysis,
         protected TimelineService $timeline,
     ) {}
 
@@ -99,10 +98,12 @@ class DocumentController extends Controller
     }
 
     /**
-     * Run Gemini analysis on extracted text and persist structured insights.
+     * Dispatches queued Gemini analysis. Mirrors extract()'s pattern:
+     * status flips to a processing state immediately so the UI
+     * reflects the click right away, and 'failed' is a valid retry
+     * starting point (this closes the gap flagged during Epic 3 -
+     * the old synchronous version had no retry path from failed).
      * Route: POST /documents/{document}/analyze
-     * (Built out fully in Epic 4 - stub retained here so the route
-     * and button in the viewer don't 404 during Epic 3 testing.)
      */
     public function analyze(Document $document): RedirectResponse
     {
@@ -112,21 +113,18 @@ class DocumentController extends Controller
                 ->with('error', 'No extracted text available. Run extraction first.');
         }
 
-        try {
-            $this->analysis->analyzeDocument($document);
-
+        if (! in_array($document->processing_status, ['analysis_pending', 'failed'], true)) {
             return redirect()
                 ->route('documents.show', $document)
-                ->with('status', 'AI analysis complete.');
-        } catch (\Throwable $e) {
-            $document->update([
-                'processing_status' => 'failed',
-                'error_message' => $e->getMessage(),
-            ]);
-
-            return redirect()
-                ->route('documents.show', $document)
-                ->with('error', 'AI analysis failed: ' . $e->getMessage());
+                ->with('error', 'This document has already been analyzed or is currently processing.');
         }
+
+        $document->update(['error_message' => null]);
+
+        AnalyzeDocumentJob::dispatch($document);
+
+        return redirect()
+            ->route('documents.show', $document)
+            ->with('status', 'Analysis queued. Refresh in a moment to see the result.');
     }
 }
