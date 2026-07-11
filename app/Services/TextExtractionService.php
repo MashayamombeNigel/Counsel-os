@@ -3,36 +3,65 @@
 namespace App\Services;
 
 use App\Models\Document;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpWord\IOFactory as WordIOFactory;
+use Smalot\PdfParser\Parser as PdfParser;
 
 class TextExtractionService
 {
     /**
-     * Extract readable text from the document file.
+     * Extracts text based on the document's mime type. Throws on
+     * failure (caught by the caller) and throws a distinct exception
+     * when extraction "succeeds" but yields no usable text - a scanned
+     * or DRM'd PDF often parses without error but returns nothing
+     * useful, and that should be treated as a failure, not a silent
+     * pass-through to analysis_pending. OCR is explicitly out of
+     * scope per the spec, so this is a hard stop, not a retry path.
      */
-    public function extractText(Document $document): bool
+    public function extract(Document $document): string
     {
-        $document->update(['processing_status' => 'extracting']);
+        $absolutePath = Storage::disk('local')->path($document->storage_path);
 
-        try {
-            // TODO: Implement smalot/pdfparser for PDFs
-            // TODO: Implement phpoffice/phpword for DOCX
-            $extractedText = "Sample extracted text...";
+        $text = match ($document->mime_type) {
+            'application/pdf' => $this->extractFromPdf($absolutePath),
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => $this->extractFromDocx($absolutePath),
+            default => throw new \RuntimeException("Unsupported mime type for extraction: {$document->mime_type}"),
+        };
 
-            $document->update([
-                'extracted_text' => $extractedText,
-                'processing_status' => 'analysis_pending',
-            ]);
+        $trimmed = trim($text);
 
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Text extraction failed: ' . $e->getMessage());
-            $document->update([
-                'processing_status' => 'failed',
-                'error_message' => 'Text extraction failed.',
-            ]);
-            
-            return false;
+        if (mb_strlen($trimmed) < 20) {
+            throw new \RuntimeException(
+                'Extraction produced little or no readable text. This document may be scanned, ' .
+                'image-based, or encrypted - OCR is not supported in this MVP.'
+            );
         }
+
+        return $trimmed;
+    }
+
+    protected function extractFromPdf(string $path): string
+    {
+        $parser = new PdfParser();
+        $pdf = $parser->parseFile($path);
+
+        return $pdf->getText();
+    }
+
+    protected function extractFromDocx(string $path): string
+    {
+        $phpWord = WordIOFactory::load($path, 'Word2007');
+        $text = '';
+
+        foreach ($phpWord->getSections() as $section) {
+            foreach ($section->getElements() as $element) {
+                if (method_exists($element, 'getText')) {
+                    $elementText = $element->getText();
+                    $text .= (is_string($elementText) ? $elementText : '') . "\n";
+                }
+            }
+        }
+
+        return $text;
     }
 }

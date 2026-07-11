@@ -2,77 +2,131 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DocumentStoreRequest;
-use App\Http\Requests\DocumentUpdateRequest;
 use App\Models\Document;
+use App\Models\Matter;
+use App\Http\Requests\UploadDocumentRequest;
+use App\Jobs\ExtractDocumentTextJob;
+use App\Services\DocumentService;
+use App\Services\AiAnalysisService;
+use App\Services\TimelineService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DocumentController extends Controller
 {
-    public function index(Request $request): Response
-    {
-        $documents = Document::all();
+    public function __construct(
+        protected DocumentService $documents,
+        protected AiAnalysisService $analysis,
+        protected TimelineService $timeline,
+    ) {}
 
-        return view('document.index', [
-            'documents' => $documents,
-        ]);
+    /**
+     * Store a newly uploaded document against a matter.
+     * Route: POST /matters/{matter}/documents
+     */
+    public function store(UploadDocumentRequest $request, Matter $matter): RedirectResponse
+    {
+        $document = $this->documents->storeUpload(
+            matter: $matter,
+            file: $request->file('file'),
+            documentType: $request->validated('document_type'),
+            uploadedBy: $request->user()->id,
+        );
+
+        $this->timeline->recordDocumentEvent(
+            document: $document,
+            action: 'document_uploaded',
+            description: "Document \"{$document->original_name}\" uploaded.",
+        );
+
+        return redirect()
+            ->route('documents.show', $document)
+            ->with('status', 'Document uploaded. Click "Run Extraction" when ready.');
     }
 
-    public function create(Request $request): Response
+    /**
+     * Show a single document with its extracted text preview and
+     * insights if analysis has completed.
+     * Route: GET /documents/{document}
+     */
+    public function show(Document $document): View
     {
-        return view('document.create');
-    }
+        $document->load('matter', 'documentInsight');
 
-    public function store(DocumentStoreRequest $request): Response
-    {
-        $document = Document::create($request->validated());
-
-        $request->session()->flash('document.id', $document->id);
-
-        return redirect()->route('documents.index');
-    }
-
-    public function show(Request $request, Document $document): Response
-    {
-        return view('document.show', [
+        return view('documents.show', [
             'document' => $document,
+            'insight' => $document->documentInsight,
         ]);
     }
 
-    public function edit(Request $request, Document $document): Response
+    public function destroy(Document $document): RedirectResponse
     {
-        return view('document.edit', [
-            'document' => $document,
-        ]);
+        $matter = $document->matter;
+        $this->documents->delete($document);
+
+        return redirect()
+            ->route('matters.show', $matter)
+            ->with('status', 'Document removed.');
     }
 
-    public function update(DocumentUpdateRequest $request, Document $document): Response
+    /**
+     * Dispatches the queued extraction job. Status flips to
+     * "extracting" immediately (synchronously, here) so the UI
+     * reflects the change right away instead of waiting for the
+     * queue worker to actually pick up the job - otherwise the page
+     * would still show "Uploaded" for however long the job sits
+     * queued, which reads as broken even when it isn't.
+     * Route: POST /documents/{document}/extract
+     */
+    public function extract(Document $document): RedirectResponse
     {
-        $document->update($request->validated());
+        // 'failed' is a valid starting point too - this is the retry
+        // path referenced in spec Section 9's status table ("Retry
+        // analysis action" for the failed state).
+        if (! in_array($document->processing_status, ['uploaded', 'failed'], true)) {
+            return redirect()
+                ->route('documents.show', $document)
+                ->with('error', 'This document has already been extracted or is currently processing.');
+        }
 
-        $request->session()->flash('document.id', $document->id);
+        $document->update(['processing_status' => 'extracting', 'error_message' => null]);
 
-        return redirect()->route('documents.index');
+        ExtractDocumentTextJob::dispatch($document);
+
+        return redirect()
+            ->route('documents.show', $document)
+            ->with('status', 'Extraction queued. Refresh in a moment to see the result.');
     }
 
-    public function destroy(Request $request, Document $document): RedirectResponse
+    /**
+     * Run Gemini analysis on extracted text and persist structured insights.
+     * Route: POST /documents/{document}/analyze
+     * (Built out fully in Epic 4 - stub retained here so the route
+     * and button in the viewer don't 404 during Epic 3 testing.)
+     */
+    public function analyze(Document $document): RedirectResponse
     {
-        $document->delete();
+        if (empty($document->extracted_text)) {
+            return redirect()
+                ->route('documents.show', $document)
+                ->with('error', 'No extracted text available. Run extraction first.');
+        }
 
-        return redirect()->route('documents.index');
-    }
+        try {
+            $this->analysis->analyzeDocument($document);
 
-    public function extract(Request $request, Document $document): RedirectResponse
-    {
-        // TODO: Call TextExtractionService
-        return redirect()->route('documents.show', $document)->with('status', 'Extraction started.');
-    }
+            return redirect()
+                ->route('documents.show', $document)
+                ->with('status', 'AI analysis complete.');
+        } catch (\Throwable $e) {
+            $document->update([
+                'processing_status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
 
-    public function analyze(Request $request, Document $document): RedirectResponse
-    {
-        // TODO: Call AiAnalysisService
-        return redirect()->route('documents.show', $document)->with('status', 'Analysis started.');
+            return redirect()
+                ->route('documents.show', $document)
+                ->with('error', 'AI analysis failed: ' . $e->getMessage());
+        }
     }
 }
