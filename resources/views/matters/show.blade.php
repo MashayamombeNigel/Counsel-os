@@ -118,36 +118,125 @@
                 <p class="text-sm text-gray-500">AI insights will appear here once a document has been analyzed.</p>
             </div>
 
-            {{-- Research - form wired in Epic 5, ResearchController already exists --}}
-            <div x-show="tab === 'research'" x-cloak class="bg-white shadow-sm rounded-lg p-5 space-y-4">
+            {{-- Research - form + history --}}
+            <div x-show="tab === 'research'" x-cloak class="space-y-4">
+
+                <div class="bg-white shadow-sm rounded-lg p-5">
+                    <form method="POST" action="{{ route('matters.research.store', $matter) }}" class="space-y-3">
+                        @csrf
+                        <label class="block text-sm font-medium text-gray-700">Ask a question about this matter</label>
+                        <textarea name="query" rows="2" maxlength="1000" required
+                                  placeholder="e.g. What liabilities does the tenant assume?"
+                                  class="block w-full rounded-md border-gray-300 shadow-sm">{{ old('query') }}</textarea>
+                        @error('query') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+                        <button type="submit"
+                                class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
+                            Ask
+                        </button>
+                        <p class="text-xs text-gray-500">
+                            Answers are grounded only in this matter's analyzed documents and are review assistance,
+                            not legal advice.
+                        </p>
+                    </form>
+                </div>
+
                 @if ($researchSessions->isEmpty())
-                    <p class="text-sm text-gray-500">No research questions asked yet.</p>
+                    <p class="text-sm text-gray-500 px-1">No research questions asked yet.</p>
                 @else
                     @foreach ($researchSessions as $session)
-                        <div class="border rounded-md p-4">
+                        <div class="bg-white shadow-sm rounded-lg p-5">
                             <p class="text-sm font-medium text-gray-900">{{ $session->query }}</p>
                             <p class="text-sm text-gray-600 mt-2 whitespace-pre-line">{{ $session->response }}</p>
+                            @if (! empty($session->sources_json))
+                                <p class="text-xs text-gray-400 mt-3">
+                                    Sources: {{ implode(', ', $session->sources_json) }}
+                                </p>
+                            @endif
                         </div>
                     @endforeach
                 @endif
             </div>
 
-            {{-- Tasks - form wired in Epic 5 --}}
-            <div x-show="tab === 'tasks'" x-cloak class="bg-white shadow-sm rounded-lg p-5">
-                @if ($tasks->isEmpty())
-                    <p class="text-sm text-gray-500">No tasks yet.</p>
-                @else
-                    <ul class="divide-y divide-gray-200">
-                        @foreach ($tasks as $task)
-                            <li class="py-3 flex justify-between items-center text-sm">
-                                <span class="{{ $task->status === 'done' ? 'line-through text-gray-400' : 'text-gray-900' }}">
-                                    {{ $task->title }}
-                                </span>
-                                <span class="text-gray-500">{{ $task->due_date?->format('M j, Y') ?? 'No due date' }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
+            {{-- Tasks - form + list, with prefill support for
+                 "Convert to Task" links coming from the AI Insights
+                 deadlines section (?tab=tasks&prefill_title=...&prefill_due_date=...&source_document_id=...) --}}
+            <div x-show="tab === 'tasks'" x-cloak class="space-y-4">
+
+                <div class="bg-white shadow-sm rounded-lg p-5">
+                    <form method="POST" action="{{ route('matters.tasks.store', $matter) }}" class="space-y-3">
+                        @csrf
+                        <input type="hidden" name="source_document_id" value="{{ request()->query('source_document_id') }}">
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Title *</label>
+                            <input type="text" name="title" required
+                                   value="{{ old('title', request()->query('prefill_title')) }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Due Date</label>
+                                <input type="date" name="due_date"
+                                       value="{{ old('due_date', request()->query('prefill_due_date')) }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Priority *</label>
+                                <select name="priority" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Description</label>
+                            <textarea name="description" rows="2"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ old('description', request()->query('prefill_reason')) }}</textarea>
+                        </div>
+
+                        <button type="submit"
+                                class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
+                            Create Task
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    @if ($tasks->isEmpty())
+                        <p class="p-5 text-sm text-gray-500">No tasks yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-200">
+                            @foreach ($tasks as $task)
+                                <li class="px-5 py-3 flex justify-between items-center text-sm">
+                                    <div>
+                                        <span class="{{ $task->status === 'done' ? 'line-through text-gray-400' : 'text-gray-900 font-medium' }}">
+                                            {{ $task->title }}
+                                        </span>
+                                        <span class="text-gray-500 block text-xs">
+                                            {{ $task->due_date?->format('M j, Y') ?? 'No due date' }} · {{ str($task->priority)->title() }} priority
+                                        </span>
+                                    </div>
+                                    @if ($task->status !== 'done')
+                                        <form method="POST" action="{{ route('tasks.update', $task) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="done">
+                                            <input type="hidden" name="priority" value="{{ $task->priority }}">
+                                            <input type="hidden" name="due_date" value="{{ $task->due_date?->format('Y-m-d') }}">
+                                            <button type="submit" class="text-xs text-gray-600 hover:text-gray-900 underline">
+                                                Mark done
+                                            </button>
+                                        </form>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
             </div>
 
             {{-- Timeline --}}
