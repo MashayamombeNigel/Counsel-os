@@ -52,9 +52,8 @@ class DemoDataSeeder extends Seeder
     protected function createFlagshipMatter(User $user): void
     {
         $client = Client::updateOrCreate(
-            ['name' => 'Acme Property Holdings'],
+            ['user_id' => $user->id, 'name' => 'Acme Property Holdings'],
             [
-                'user_id' => $user->id,
                 'organization' => 'Acme Property Holdings LLC',
                 'email' => 'contact@acmeproperty.example',
                 'phone' => '555-0142',
