@@ -91,7 +91,7 @@
                             $dueBadge = match (true) {
                                 $daysUntil < 0 => ['label' => 'Overdue', 'class' => 'bg-error-container text-on-error-container'],
                                 $daysUntil === 0 => ['label' => 'Due Today', 'class' => 'bg-error-container text-on-error-container'],
-                                $daysUntil <= 3 => ['label' => $daysUntil === 1 ? 'In 1 Day' : "In {$daysUntil} Days", 'class' => 'bg-amber-100 text-amber-800'],
+                                $daysUntil <= 3 => ['label' => "In {$daysUntil} Days", 'class' => 'bg-amber-100 text-amber-800'],
                                 default => ['label' => $task->due_date->format('M j'), 'class' => 'bg-surface-container-high text-on-surface-variant'],
                             };
                         @endphp
@@ -180,7 +180,7 @@
                             </div>
                             <div class="flex-grow bg-surface p-4 rounded-xl border border-surface-variant">
                                 <div class="flex justify-between items-center mb-1">
-                                    <span class="text-label-md text-primary">{{ $entry->matter?->title ?? 'General' }}</span>
+                                    <span class="text-label-md text-primary">{{ $entry->matter->title ?? 'General' }}</span>
                                     <span class="text-body-sm text-on-surface-variant">{{ $entry->created_at->diffForHumans() }}</span>
                                 </div>
                                 <p class="text-body-sm text-on-surface-variant">{{ $entry->description }}</p>

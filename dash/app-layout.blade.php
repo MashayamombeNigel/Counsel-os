@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name', 'CounselOS') }}</title>
 
-    @include('partials.head-fonts')
+    @include('partials.head-fonts') {{-- see head_fonts_snippet.blade.php - place at resources/views/partials/head-fonts.blade.php --}}
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -29,7 +29,7 @@
         <div class="flex items-center gap-stack-md">
             <form method="GET" action="{{ route('search') }}" class="relative hidden lg:block mr-4">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
-                <input name="q" aria-label="Search" class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-secondary/20"
+                <input name="q" class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-secondary/20"
                        placeholder="Search matters, docs..." type="text">
             </form>
             <div class="w-8 h-8 rounded-full overflow-hidden ml-2 border border-outline-variant bg-secondary-container flex items-center justify-center text-white text-xs font-bold">
@@ -93,7 +93,7 @@
     </aside>
 
     {{-- Main content --}}
-    <main class="md:ml-64 p-gutter max-w-[1440px] mx-auto">
+    <main class="md:ml-64 p-gutter max-w-container-max mx-auto">
         {{-- Backward-compatible header slot for pages that haven't been
              redesigned yet (Clients, Matters, etc still use the simple
              x-slot('header') pattern from before this shell change). --}}

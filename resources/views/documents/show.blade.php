@@ -14,17 +14,6 @@
 
     <div class="py-6 max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-        @if (session('status'))
-            <div class="bg-green-50 border border-green-200 text-green-800 text-sm rounded-md p-4">
-                {{ session('status') }}
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="bg-red-50 border border-red-200 text-red-800 text-sm rounded-md p-4">
-                {{ session('error') }}
-            </div>
-        @endif
 
         <div class="bg-white shadow-sm rounded-lg p-6 grid grid-cols-2 gap-4 text-sm">
             <div><span class="text-gray-500">Type:</span> {{ str($document->document_type)->title() }}</div>

@@ -27,6 +27,9 @@ class DashboardController extends Controller
     {
         return view('dashboard', [
             'openMattersCount' => Matter::where('status', '!=', 'closed')->count(),
+            'totalMattersCount' => Matter::count(),
+            'pendingTasksCount' => Task::where('status', '!=', 'done')->count(),
+            'totalDocumentsCount' => Document::count(),
             'recentDocuments' => Document::with('matter')->latest()->limit(5)->get(),
             'upcomingTasks' => Task::with('matter')
                 ->where('status', '!=', 'done')
