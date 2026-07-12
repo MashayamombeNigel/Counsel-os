@@ -2,65 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\TaskStoreRequest;
-use App\Http\Requests\TaskUpdateRequest;
+use App\Models\Matter;
 use App\Models\Task;
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
+use App\Services\TaskService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class TaskController extends Controller
 {
-    public function index(Request $request): Response
-    {
-        $tasks = Task::all();
+    public function __construct(
+        protected TaskService $tasks,
+    ) {}
 
-        return view('task.index', [
-            'tasks' => $tasks,
-        ]);
+    /**
+     * Route: POST /matters/{matter}/tasks
+     * Handles both manual task creation and "convert deadline to
+     * task" - the latter arrives here with source_document_id
+     * already set from the prefilled form in the AI Insights tab.
+     */
+    public function store(StoreTaskRequest $request, Matter $matter): RedirectResponse
+    {
+        $this->tasks->create($matter, $request->validated(), $request->user()->id);
+
+        return redirect()
+            ->route('matters.show', ['matter' => $matter, 'tab' => 'tasks'])
+            ->with('status', 'Task created.');
     }
 
-    public function create(Request $request): Response
+    /**
+     * Route: PATCH /tasks/{task}
+     * Status/priority/due_date changes - status transitions write
+     * a timeline entry via TaskService::update().
+     */
+    public function update(UpdateTaskRequest $request, Task $task): RedirectResponse
     {
-        return view('task.create');
-    }
+        $this->tasks->update($task, $request->validated());
 
-    public function store(TaskStoreRequest $request): Response
-    {
-        $task = Task::create($request->validated());
-
-        $request->session()->flash('task.id', $task->id);
-
-        return redirect()->route('tasks.index');
-    }
-
-    public function show(Request $request, Task $task): Response
-    {
-        return view('task.show', [
-            'task' => $task,
-        ]);
-    }
-
-    public function edit(Request $request, Task $task): Response
-    {
-        return view('task.edit', [
-            'task' => $task,
-        ]);
-    }
-
-    public function update(TaskUpdateRequest $request, Task $task): Response
-    {
-        $task->update($request->validated());
-
-        $request->session()->flash('task.id', $task->id);
-
-        return redirect()->route('tasks.index');
-    }
-
-    public function destroy(Request $request, Task $task): Response
-    {
-        $task->delete();
-
-        return redirect()->route('tasks.index');
+        return redirect()
+            ->route('matters.show', ['matter' => $task->matter, 'tab' => 'tasks'])
+            ->with('status', 'Task updated.');
     }
 }

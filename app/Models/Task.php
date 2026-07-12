@@ -2,19 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Task extends Model
 {
-    use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'matter_id',
         'source_document_id',
@@ -27,22 +19,10 @@ class Task extends Model
         'completed_at',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'id' => 'integer',
-            'matter_id' => 'integer',
-            'source_document_id' => 'integer',
-            'due_date' => 'date',
-            'created_by' => 'integer',
-            'completed_at' => 'timestamp',
-        ];
-    }
+    protected $casts = [
+        'due_date' => 'date',
+        'completed_at' => 'datetime',
+    ];
 
     public function matter(): BelongsTo
     {
@@ -51,11 +31,6 @@ class Task extends Model
 
     public function sourceDocument(): BelongsTo
     {
-        return $this->belongsTo(Document::class);
-    }
-
-    public function createdBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Document::class, 'source_document_id');
     }
 }

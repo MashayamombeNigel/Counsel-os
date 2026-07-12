@@ -17,9 +17,11 @@ class ResearchController extends Controller
      * Ask a matter-scoped research question and save the session.
      * Route: POST /matters/{matter}/research
      *
-     * Not a full resourceful controller - research has no independent
-     * index/show/edit views. It only ever renders inside the matter
-     * workspace's Research tab, so a single store action is all this needs.
+     * Runs synchronously (no queue) per decision - research is
+     * conversational and a queue+refresh step would hurt the UX.
+     * Since there's no queue safety net here, a Gemini failure is
+     * caught directly and surfaced as a flash error rather than
+     * silently losing the user's question.
      */
     public function store(Request $request, Matter $matter): RedirectResponse
     {
@@ -27,15 +29,21 @@ class ResearchController extends Controller
             'query' => ['required', 'string', 'max:1000'],
         ]);
 
-        $session = $this->research->answerQuestion(
-            matter: $matter,
-            question: $validated['query'],
-            userId: $request->user()->id,
-        );
+        try {
+            $this->research->answerQuestion(
+                matter: $matter,
+                question: $validated['query'],
+                userId: $request->user()->id,
+            );
 
-        return redirect()
-            ->route('matters.show', ['matter' => $matter, 'tab' => 'research'])
-            ->with('status', 'Research answer saved.')
-            ->with('latest_research_session_id', $session->id);
+            return redirect()
+                ->route('matters.show', ['matter' => $matter, 'tab' => 'research'])
+                ->with('status', 'Research answer saved.');
+        } catch (\Throwable $e) {
+            return redirect()
+                ->route('matters.show', ['matter' => $matter, 'tab' => 'research'])
+                ->with('error', 'Research request failed: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 }

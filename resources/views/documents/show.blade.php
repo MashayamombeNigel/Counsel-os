@@ -117,7 +117,17 @@
                                         <p class="text-gray-500">{{ $deadline['reason'] ?? '' }}</p>
                                     </div>
                                     <span class="text-gray-600">{{ $deadline['date'] ?? 'unknown' }}</span>
-                                    {{-- "Convert to Task" wiring arrives in Epic 5 --}}
+                                    <a href="{{ route('matters.show', [
+                                            'matter' => $document->matter_id,
+                                            'tab' => 'tasks',
+                                            'prefill_title' => $deadline['title'] ?? 'Untitled deadline',
+                                            'prefill_due_date' => ($deadline['date'] ?? 'unknown') !== 'unknown' ? $deadline['date'] : '',
+                                            'prefill_reason' => $deadline['reason'] ?? '',
+                                            'source_document_id' => $document->id,
+                                        ]) }}"
+                                       class="text-xs text-gray-700 hover:text-gray-900 underline whitespace-nowrap ml-3">
+                                        Convert to Task
+                                    </a>
                                 </div>
                             @endforeach
                         </div>
