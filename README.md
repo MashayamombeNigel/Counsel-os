@@ -15,8 +15,7 @@
 
 **CounselOS** is an intelligent, streamlined legal practice management MVP designed specifically for small firms and solo attorneys. It moves beyond standard CRM by integrating Google's Gemini AI directly into the document review and research workflows, turning static contracts into actionable intelligence.
 
-![CounselOS Dashboard](docs/screenshots/dashboard.png)
-*(Placeholder: Dashboard Screenshot)*
+<!-- TODO: Add screenshot at docs/screenshots/dashboard.png -->
 
 ## Features
 
