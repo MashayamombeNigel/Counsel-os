@@ -93,7 +93,7 @@
     </aside>
 
     {{-- Main content --}}
-    <main class="md:ml-64 p-gutter max-w-container-max mx-auto">
+    <main class="md:ml-64 p-gutter max-w-[1440px] mx-auto">
         {{-- Backward-compatible header slot for pages that haven't been
              redesigned yet (Clients, Matters, etc still use the simple
              x-slot('header') pattern from before this shell change). --}}
