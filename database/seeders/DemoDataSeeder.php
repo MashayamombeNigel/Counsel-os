@@ -218,9 +218,8 @@ class DemoDataSeeder extends Seeder
 
         foreach ($fillerClients as $index => $clientData) {
             $client = Client::updateOrCreate(
-                ['name' => $clientData['name']],
+                ['user_id' => $user->id, 'name' => $clientData['name']],
                 [
-                    'user_id' => $user->id,
                     'organization' => $clientData['organization'],
                     'email' => strtolower(str_replace(' ', '.', $clientData['name'])) . '@example.com',
                 ]
