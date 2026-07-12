@@ -59,23 +59,58 @@
                 @endif
             </div>
 
-            {{-- Documents - upload form + list; wired fully in Epic 3 --}}
-            <div x-show="tab === 'documents'" x-cloak class="bg-white shadow-sm rounded-lg p-5">
-                @if ($documents->isEmpty())
-                    <p class="text-sm text-gray-500">No documents uploaded yet.</p>
-                @else
-                    <ul class="divide-y divide-gray-200">
-                        @foreach ($documents as $document)
-                            <li class="py-3 flex justify-between items-center text-sm">
-                                <a href="{{ route('documents.show', $document) }}" class="font-medium text-gray-900">
-                                    {{ $document->original_name }}
-                                </a>
-                                <x-document-processing-badge :status="$document->processing_status" />
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-                {{-- Upload form arrives in Epic 3 --}}
+            {{-- Documents - upload form + list --}}
+            <div x-show="tab === 'documents'" x-cloak class="space-y-4">
+
+                <div class="bg-white shadow-sm rounded-lg p-5">
+                    <form method="POST" action="{{ route('matters.documents.store', $matter) }}"
+                          enctype="multipart/form-data" class="flex flex-wrap gap-3 items-end">
+                        @csrf
+
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-700">File (PDF or DOCX, max 20MB)</label>
+                            <input type="file" name="file" accept=".pdf,.docx" required
+                                   class="mt-1 block w-full text-sm text-gray-600">
+                            @error('file') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Document Type</label>
+                            <select name="document_type" required
+                                    class="mt-1 block rounded-md border-gray-300 shadow-sm text-sm">
+                                <option value="contract">Contract</option>
+                                <option value="lease">Lease</option>
+                                <option value="title_deed">Title Deed</option>
+                                <option value="correspondence">Correspondence</option>
+                                <option value="research">Research</option>
+                                <option value="other">Other</option>
+                            </select>
+                            @error('document_type') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <button type="submit"
+                                class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700">
+                            Upload
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    @if ($documents->isEmpty())
+                        <p class="p-5 text-sm text-gray-500">No documents uploaded yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-200">
+                            @foreach ($documents as $document)
+                                <li class="px-5 py-3 flex justify-between items-center text-sm">
+                                    <a href="{{ route('documents.show', $document) }}" class="font-medium text-gray-900">
+                                        {{ $document->original_name }}
+                                    </a>
+                                    <x-document-processing-badge :status="$document->processing_status" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
             </div>
 
             {{-- AI Insights - populated once documents are analyzed (Epic 4) --}}

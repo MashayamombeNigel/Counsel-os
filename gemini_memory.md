@@ -12,5 +12,6 @@ Tech Stack: Laravel 12, PostgreSQL 16, Blade, Tailwind, Alpine.js, Gemini API (g
 ## Current Progress (Completed)
 - **Epic 0 & 1**: Setup, database, basic services, and routing.
 - **Epic 2**: Client & Matter views implemented. ClientCRUD, Matter Workspace shell with placeholder tabs, and Activity Timeline integration wired.
+- **Epic 3**: Document upload flow, secure private storage, text extraction (pdfparser/phpword) via database queue.
 
-## Current Focus: Epic 3 (Documents and text extraction)
+## Current Focus: Epic 4 (Gemini AI insights)
