@@ -1,9 +1,6 @@
 {{--
-    Add this inside the <head> of the file that defines <x-app-layout>
-    (see app-layout.blade.php below) - not a standalone file, a snippet
-    to merge in. Vite already compiles Tailwind/app.css, but these are
-    external font links the reference design depends on and aren't
-    part of the npm build pipeline.
+    External font/icon links used by the app layout (<x-app-layout>).
+    Tailwind/app.css is compiled by Vite; these remain external.
 --}}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
