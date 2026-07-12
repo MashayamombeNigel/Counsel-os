@@ -29,6 +29,10 @@ class MatterController extends Controller
                 clientId: $request->query('client'),
                 term: $request->query('search'),
             ),
+            'clients' => Client::whereNull('archived_at')->orderBy('name')->get(['id', 'name']),
+            'currentStatus' => $request->query('status'),
+            'currentClientId' => $request->query('client'),
+            'currentSearch' => $request->query('search'),
         ]);
     }
 
