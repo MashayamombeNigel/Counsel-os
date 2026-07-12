@@ -26,7 +26,7 @@
                    class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-body-sm focus:ring-2 focus:ring-secondary/20">
         </div>
 
-        <select name="status" class="bg-surface-container-low border-none rounded-lg px-3 py-2 text-body-sm focus:ring-2 focus:ring-secondary/20">
+        <select name="status" aria-label="Filter matters by status" class="bg-surface-container-low border-none rounded-lg px-3 py-2 text-body-sm focus:ring-2 focus:ring-secondary/20">
             <option value="">All statuses</option>
             @foreach (['open' => 'Open', 'in_review' => 'In Review', 'waiting_client' => 'Waiting Client', 'closed' => 'Closed'] as $value => $label)
                 <option value="{{ $value }}" @selected($currentStatus === $value)>{{ $label }}</option>
