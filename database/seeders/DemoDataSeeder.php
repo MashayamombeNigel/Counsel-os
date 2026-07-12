@@ -177,9 +177,8 @@ class DemoDataSeeder extends Seeder
         // question exactly, with a plausible answer grounded in the
         // seeded insight data above.
         ResearchSession::updateOrCreate(
-            ['matter_id' => $matter->id, 'query' => 'What liabilities does the tenant assume?'],
+            ['matter_id' => $matter->id, 'user_id' => $user->id, 'query' => 'What liabilities does the tenant assume?'],
             [
-                'user_id' => $user->id,
                 'response' => "Short answer: The tenant assumes liability primarily around insurance, timely rent payment, and interior maintenance.\n\nSupporting points:\n- Tenant must maintain at least \$1,000,000 in commercial general liability insurance for the full lease term.\n- A 5% late payment penalty applies after only a 5-day grace period - a relatively narrow window.\n- Tenant is responsible for interior maintenance and minor repairs, though structural/exterior liability remains with the Landlord.\n- The termination notice clause does not specify a valid delivery method, which could expose either party to a dispute if a notice is contested.\n\nRelevant source document: Sample_Commercial_Lease_Agreement.pdf\n\nThis is AI-generated review assistance and does not constitute legal advice.",
                 'sources_json' => ['Sample_Commercial_Lease_Agreement.pdf'],
                 'model_name' => 'gemini-2.5-flash',
