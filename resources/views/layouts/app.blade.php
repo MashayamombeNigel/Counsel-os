@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name', 'CounselOS') }}</title>
 
-    @include('partials.head-fonts') {{-- see head_fonts_snippet.blade.php - place at resources/views/partials/head-fonts.blade.php --}}
+    @include('partials.head-fonts')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
