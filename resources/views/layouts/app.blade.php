@@ -29,7 +29,7 @@
         <div class="flex items-center gap-stack-md">
             <form method="GET" action="{{ route('search') }}" class="relative hidden lg:block mr-4">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
-                <input name="q" class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-secondary/20"
+                <input name="q" aria-label="Search" class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-secondary/20"
                        placeholder="Search matters, docs..." type="text">
             </form>
             <div class="w-8 h-8 rounded-full overflow-hidden ml-2 border border-outline-variant bg-secondary-container flex items-center justify-center text-white text-xs font-bold">
