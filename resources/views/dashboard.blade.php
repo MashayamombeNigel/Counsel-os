@@ -180,7 +180,7 @@
                             </div>
                             <div class="flex-grow bg-surface p-4 rounded-xl border border-surface-variant">
                                 <div class="flex justify-between items-center mb-1">
-                                    <span class="text-label-md text-primary">{{ $entry->matter->title ?? 'General' }}</span>
+                                    <span class="text-label-md text-primary">{{ $entry->matter?->title ?? 'General' }}</span>
                                     <span class="text-body-sm text-on-surface-variant">{{ $entry->created_at->diffForHumans() }}</span>
                                 </div>
                                 <p class="text-body-sm text-on-surface-variant">{{ $entry->description }}</p>
