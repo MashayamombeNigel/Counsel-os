@@ -33,7 +33,7 @@
             @endforeach
         </select>
 
-        <select name="client" class="bg-surface-container-low border-none rounded-lg px-3 py-2 text-body-sm focus:ring-2 focus:ring-secondary/20">
+        <select name="client" aria-label="Filter matters by client" class="bg-surface-container-low border-none rounded-lg px-3 py-2 text-body-sm focus:ring-2 focus:ring-secondary/20">
             <option value="">All clients</option>
             @foreach ($clients as $client)
                 <option value="{{ $client->id }}" @selected((string) $currentClientId === (string) $client->id)>{{ $client->name }}</option>
