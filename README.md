@@ -1,59 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+  <img src="https://ui-avatars.com/api/?name=Counsel+OS&background=091426&color=fff&size=128&rounded=true" alt="CounselOS Logo">
+  <h1>CounselOS</h1>
+  <p><strong>AI-Powered Legal Matter Intelligence Platform</strong></p>
+</div>
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <a href="#features">Features</a> •
+  <a href="#ai-prompt-architecture">AI Prompt Architecture</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#local-setup--demo">Local Setup & Demo</a>
 </p>
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**CounselOS** is an intelligent, streamlined legal practice management MVP designed specifically for small firms and solo attorneys. It moves beyond standard CRM by integrating Google's Gemini AI directly into the document review and research workflows, turning static contracts into actionable intelligence.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+![CounselOS Dashboard](docs/screenshots/dashboard.png)
+*(Placeholder: Dashboard Screenshot)*
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+- 💼 **Client & Matter Management:** Organize your firm's active cases, clients, and statuses in a clean, modern UI (Lexis Modern design system).
+- 📄 **Document Processing Pipeline:** Upload contracts (PDF/DOCX) securely. Text is extracted in the background via queued workers without blocking the UI.
+- 🤖 **AI-Generated Insights:** Automatic parsing of key parties, risks, obligations, and deadlines directly from complex legal documents using structured JSON responses.
+- 📅 **Actionable Deadlines:** One-click conversion of AI-discovered document deadlines into trackable system tasks.
+- 🔍 **Context-Aware Research:** A built-in chat interface that builds contextual prompts from a matter's document insights, allowing attorneys to ask specific questions about a case and receive accurate, cited answers.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## AI Prompt Architecture
 
-## Laravel Sponsors
+CounselOS stands out through its highly structured **Prompt Architecture**, located in `app/Support/Prompts/`. Instead of haphazardly sending raw document text to the LLM, the system employs a multi-tiered context builder:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. **Extraction (Queue-Driven):** `pdfparser` and `phpword` extract raw text securely in the background.
+2. **Analysis (JSON Schema):** The `AiAnalysisService` instructs Gemini to return strictly typed JSON (`DocumentInsight`), condensing a 20-page contract into structured intelligence (Risks, Obligations, Deadlines) while discarding noise.
+3. **Research Context Assembly:** When an attorney asks a question via the Research tab, the `ResearchService` does **not** send the raw text of all documents (which would blow past context windows and introduce hallucinations). Instead, it injects the *condensed AI insights* into a highly constrained `MatterResearchPrompt`, ensuring answers are cited, relevant, and restricted to the known facts of the case.
 
-### Premium Partners
+![AI Insights Tab](docs/screenshots/ai_insights.png)
+*(Placeholder: AI Insights Screenshot)*
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## Tech Stack
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Framework:** [Laravel 12](https://laravel.com)
+- **Database:** PostgreSQL 16
+- **Frontend:** Blade, [Tailwind CSS](https://tailwindcss.com/) (Custom *Lexis Modern* Theme), Alpine.js
+- **AI Integration:** Google Gemini API (`gemini-2.5-flash`) via direct HTTP client.
+- **Background Processing:** Laravel Database Queues for asynchronous document extraction.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Local Setup & Demo
 
-## Security Vulnerabilities
+CounselOS includes a robust demo seeder to instantly populate the application with realistic matters, clients, and pre-analyzed documents for portfolio demonstration.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 1. Prerequisites
+- PHP 8.2+
+- Composer
+- Node.js & NPM
+- PostgreSQL
+- A Google Gemini API Key
 
-## License
+### 2. Installation
+```bash
+git clone https://github.com/yourusername/CounselOS.git
+cd CounselOS
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+composer install
+npm install
+```
+
+### 3. Configuration
+Copy the environment file and set your database credentials and Gemini API key:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+**Important `.env` variables:**
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=counselos
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+GEMINI_API_KEY=your_api_key_here
+QUEUE_CONNECTION=database
+```
+
+### 4. Database & Demo Seeding
+Run the migrations and trigger the demo seeder:
+```bash
+php artisan migrate:fresh --seed
+```
+
+### 5. Running the Application
+You will need two terminal windows to run the web server and the queue worker simultaneously.
+
+**Terminal 1 (Web Server & Assets):**
+```bash
+npm run dev
+php artisan serve
+```
+
+**Terminal 2 (Queue Worker):**
+```bash
+# Required for document extraction to process in the background
+php artisan queue:work
+```
+
+### 6. Demo Login Credentials
+Access the application at `http://localhost:8000` (or your configured local domain) using the seeded credentials:
+
+- **Email:** `demo@counselos.test`
+- **Password:** `password`
+
+---
+
+<div align="center">
+  <i>Built with precision for modern legal workflows.</i>
+</div>
