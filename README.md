@@ -36,8 +36,7 @@ CounselOS stands out through its highly structured **Prompt Architecture**, loca
 2. **Analysis (JSON Schema):** The `AiAnalysisService` instructs Gemini to return strictly typed JSON (`DocumentInsight`), condensing a 20-page contract into structured intelligence (Risks, Obligations, Deadlines) while discarding noise.
 3. **Research Context Assembly:** When an attorney asks a question via the Research tab, the `ResearchService` does **not** send the raw text of all documents (which would blow past context windows and introduce hallucinations). Instead, it injects the *condensed AI insights* into a highly constrained `MatterResearchPrompt`, ensuring answers are cited, relevant, and restricted to the known facts of the case.
 
-![AI Insights Tab](docs/screenshots/ai_insights.png)
-*(Placeholder: AI Insights Screenshot)*
+<!-- TODO: Add screenshot at docs/screenshots/ai_insights.png -->
 
 ---
 
