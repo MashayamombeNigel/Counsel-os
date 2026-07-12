@@ -253,15 +253,17 @@ class DemoDataSeeder extends Seeder
 
     protected function logTimeline(int $matterId, int $userId, string $action, string $description, $createdAt): void
     {
-        ActivityLog::create([
+        $log = new ActivityLog([
             'user_id' => $userId,
             'matter_id' => $matterId,
             'subject_type' => Matter::class,
             'subject_id' => $matterId,
             'action' => $action,
             'description' => $description,
-            'created_at' => $createdAt,
-            'updated_at' => $createdAt,
         ]);
+
+        $log->created_at = $createdAt;
+        $log->updated_at = $createdAt;
+        $log->save();
     }
 }
