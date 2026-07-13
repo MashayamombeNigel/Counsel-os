@@ -23,7 +23,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres -d counselos_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -50,9 +50,19 @@ jobs:
       - name: Run database migrations
         run: php artisan migrate --force
         env:
+          DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: counselos_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
 
       - name: Run Pest test suite
         run: ./vendor/bin/pest --ci
         env:
+          DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: counselos_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
