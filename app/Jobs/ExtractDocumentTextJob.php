@@ -27,6 +27,11 @@ class ExtractDocumentTextJob implements ShouldQueue
         protected Document $document,
     ) {}
 
+    public function document(): Document
+    {
+        return $this->document;
+    }
+
     public function handle(TextExtractionService $extraction, TimelineService $timeline): void
     {
         try {
