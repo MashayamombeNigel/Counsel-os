@@ -28,6 +28,11 @@ class AnalyzeDocumentJob implements ShouldQueue
         protected Document $document,
     ) {}
 
+    public function document(): Document
+    {
+        return $this->document;
+    }
+
     public function handle(AiAnalysisService $analysis, TimelineService $timeline): void
     {
         try {
