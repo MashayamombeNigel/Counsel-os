@@ -10,11 +10,6 @@ class ActivityLog extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'user_id',
         'matter_id',
@@ -25,11 +20,6 @@ class ActivityLog extends Model
         'metadata_json',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [

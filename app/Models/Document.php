@@ -11,11 +11,6 @@ class Document extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'matter_id',
         'uploaded_by',
@@ -30,11 +25,6 @@ class Document extends Model
         'error_message',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [

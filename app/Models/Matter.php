@@ -11,11 +11,6 @@ class Matter extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'client_id',
         'title',
@@ -26,11 +21,6 @@ class Matter extends Model
         'closed_at',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [

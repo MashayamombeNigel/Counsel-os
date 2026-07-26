@@ -6,14 +6,9 @@ use RuntimeException;
 
 class GeminiJsonParser
 {
-    /**
-     * Keys the document analysis schema expects. Only 'summary' is
-     * strictly required per the lenient validation decision - a
-     * document with no risks or deadlines is a legitimate result
-     * (e.g. a simple correspondence letter), not a parsing failure.
-     * Missing optional keys default to an empty array/string rather
-     * than causing the whole analysis to fail.
-     */
+    // Only 'summary' is required — a document with no risks or deadlines is a
+    // legitimate result (e.g. a simple letter). Missing optional keys default to
+    // empty arrays rather than failing the whole analysis.
     protected const DEFAULTS = [
         'summary' => '',
         'key_parties' => [],
@@ -25,14 +20,9 @@ class GeminiJsonParser
     ];
 
     /**
-     * Parses Gemini's raw text response into the expected structured
-     * array. Handles the common failure mode where the model wraps
-     * JSON in markdown fences (```json ... ```) despite being told
-     * to return only JSON.
-     *
-     * Throws if the text isn't valid JSON at all, or if 'summary' is
-     * missing/empty - those are the only cases treated as a real
-     * parsing failure under the lenient policy.
+     * Strips markdown fences before decoding — Gemini wraps JSON in ```json ... ```
+     * blocks despite being instructed to return plain JSON.
+     * Throws if the result is not valid JSON or if 'summary' is missing.
      */
     public static function parse(string $rawResponse): array
     {
@@ -50,9 +40,6 @@ class GeminiJsonParser
             throw new RuntimeException('Gemini response is missing a summary - treating as a failed analysis.');
         }
 
-        // Merge decoded values over defaults so any missing optional
-        // key is filled in rather than causing a null-access error
-        // later when the AI Insights view renders these fields.
         return array_merge(self::DEFAULTS, array_intersect_key($decoded, self::DEFAULTS));
     }
 
@@ -60,7 +47,6 @@ class GeminiJsonParser
     {
         $trimmed = trim($text);
 
-        // Matches ```json ... ``` or plain ``` ... ``` wrapping.
         if (preg_match('/^```(?:json)?\s*(.*?)\s*```$/s', $trimmed, $matches)) {
             return $matches[1];
         }

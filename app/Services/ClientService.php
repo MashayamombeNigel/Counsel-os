@@ -8,10 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ClientService
 {
-    /**
-     * Paginated, optionally search-filtered client list.
-     * Matches US-B1 acceptance criteria: created client appears in list.
-     */
     public function search(?string $term = null): LengthAwarePaginator
     {
         return Client::query()
@@ -48,10 +44,6 @@ class ClientService
         $client->update(['archived_at' => now()]);
     }
 
-    /**
-     * Client profile view data: the client plus its matters and the
-     * most recent documents across those matters (US-B1 / dashboard use).
-     */
     public function getProfileData(Client $client): array
     {
         $client->load(['matters' => fn ($q) => $q->latest()]);

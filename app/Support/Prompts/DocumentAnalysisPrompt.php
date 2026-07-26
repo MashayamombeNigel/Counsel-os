@@ -4,11 +4,6 @@ namespace App\Support\Prompts;
 
 class DocumentAnalysisPrompt
 {
-    /**
-     * System prompt - sets the assistant's role and boundaries.
-     * Matches spec Section 10's exact prompt contract: legal review
-     * assistant, not a source of final legal advice, extraction-only.
-     */
     public static function system(): string
     {
         return <<<PROMPT
@@ -19,12 +14,9 @@ class DocumentAnalysisPrompt
     }
 
     /**
-     * User prompt - the extraction instruction plus the document text.
-     * Truncates extremely long documents to keep the request within a
-     * reasonable token budget; the spec's non-functional requirements
-     * don't mandate full-document analysis for arbitrarily large files,
-     * and Gemini Flash's context window isn't the bottleneck we need to
-     * plan around at MVP scale - request size and latency are.
+     * Documents are truncated to 30,000 characters to keep requests within a
+     * reasonable token budget. Latency and request size are the binding constraint
+     * at this scale, not Gemini's context window.
      */
     public static function user(string $extractedText): string
     {

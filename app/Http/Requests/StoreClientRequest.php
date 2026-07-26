@@ -8,9 +8,6 @@ class StoreClientRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Any authenticated user can create clients in this MVP -
-        // no per-firm ownership model yet (see spec Section 17,
-        // multi-tenancy is explicitly out of scope).
         return true;
     }
 

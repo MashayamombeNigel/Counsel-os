@@ -20,12 +20,8 @@ class DocumentInsight extends Model
         'raw_ai_response',
     ];
 
-    /**
-     * Without these casts, passing PHP arrays (from GeminiJsonParser)
-     * straight into json columns via updateOrCreate() would fail or
-     * silently store malformed data. These casts handle the array
-     * <-> JSON conversion transparently in both directions.
-     */
+    // Casts handle array <-> JSON conversion in both directions,
+    // so PHP arrays from GeminiJsonParser can be passed directly into json columns.
     protected $casts = [
         'key_parties_json' => 'array',
         'key_clauses_json' => 'array',

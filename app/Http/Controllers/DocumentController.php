@@ -19,10 +19,6 @@ class DocumentController extends Controller
         protected TimelineService $timeline,
     ) {}
 
-    /**
-     * Store a newly uploaded document against a matter.
-     * Route: POST /matters/{matter}/documents
-     */
     public function store(UploadDocumentRequest $request, Matter $matter): RedirectResponse
     {
         $document = $this->documents->storeUpload(
@@ -43,11 +39,6 @@ class DocumentController extends Controller
             ->with('status', 'Document uploaded. Click "Run Extraction" when ready.');
     }
 
-    /**
-     * Show a single document with its extracted text preview and
-     * insights if analysis has completed.
-     * Route: GET /documents/{document}
-     */
     public function show(Document $document): View
     {
         $document->load('matter', 'documentInsight');
@@ -69,19 +60,12 @@ class DocumentController extends Controller
     }
 
     /**
-     * Dispatches the queued extraction job. Status flips to
-     * "extracting" immediately (synchronously, here) so the UI
-     * reflects the change right away instead of waiting for the
-     * queue worker to actually pick up the job - otherwise the page
-     * would still show "Uploaded" for however long the job sits
-     * queued, which reads as broken even when it isn't.
-     * Route: POST /documents/{document}/extract
+     * Status is flipped to 'extracting' synchronously before dispatch so the UI
+     * reflects the change immediately rather than waiting for the queue worker.
+     * 'failed' is a valid starting state here — this is the retry path.
      */
     public function extract(Document $document): RedirectResponse
     {
-        // 'failed' is a valid starting point too - this is the retry
-        // path referenced in spec Section 9's status table ("Retry
-        // analysis action" for the failed state).
         if (! in_array($document->processing_status, ['uploaded', 'failed'], true)) {
             return redirect()
                 ->route('documents.show', $document)
@@ -98,12 +82,8 @@ class DocumentController extends Controller
     }
 
     /**
-     * Dispatches queued Gemini analysis. Mirrors extract()'s pattern:
-     * status flips to a processing state immediately so the UI
-     * reflects the click right away, and 'failed' is a valid retry
-     * starting point (this closes the gap flagged during Epic 3 -
-     * the old synchronous version had no retry path from failed).
-     * Route: POST /documents/{document}/analyze
+     * Mirrors extract(): status flips synchronously before dispatch.
+     * 'failed' is a valid starting state — this is the retry path.
      */
     public function analyze(Document $document): RedirectResponse
     {

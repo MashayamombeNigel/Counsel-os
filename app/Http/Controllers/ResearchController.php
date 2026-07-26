@@ -14,14 +14,9 @@ class ResearchController extends Controller
     ) {}
 
     /**
-     * Ask a matter-scoped research question and save the session.
-     * Route: POST /matters/{matter}/research
-     *
-     * Runs synchronously (no queue) per decision - research is
-     * conversational and a queue+refresh step would hurt the UX.
-     * Since there's no queue safety net here, a Gemini failure is
-     * caught directly and surfaced as a flash error rather than
-     * silently losing the user's question.
+     * Runs synchronously (no queue) — research is conversational and a queue+poll
+     * loop would hurt UX. Gemini failures are caught here and surfaced as flash
+     * errors rather than silently dropped.
      */
     public function store(Request $request, Matter $matter): RedirectResponse
     {

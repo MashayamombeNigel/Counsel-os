@@ -12,17 +12,6 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    /**
-     * Route: GET /dashboard
-     * Response: counts for open matters, recent documents, upcoming
-     * tasks, and latest activity - per spec US-A2. Empty states are
-     * handled in the Blade view, not here.
-     *
-     * NOTE: this replaces a Blueprint-generated stub that referenced
-     * a non-existent Dashboard::all() - Dashboard isn't a domain
-     * model, it's an aggregate view over Matter/Document/Task/
-     * ActivityLog, so this controller queries those directly.
-     */
     public function index(): View
     {
         return view('dashboard', [
@@ -41,11 +30,6 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
-     * Route: GET /search
-     * Basic search across clients, matters, and documents per spec
-     * Section 6 ("Search" module) and Section 15's /search contract.
-     */
     public function search(Request $request): View
     {
         $term = $request->query('q');

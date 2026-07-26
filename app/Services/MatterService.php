@@ -12,10 +12,6 @@ class MatterService
         protected TimelineService $timeline,
     ) {}
 
-    /**
-     * Paginated, filterable matter list per spec Section 15
-     * (query: status, client, search).
-     */
     public function search(?string $status = null, ?int $clientId = null, ?string $term = null): LengthAwarePaginator
     {
         return Matter::query()
@@ -46,9 +42,8 @@ class MatterService
     }
 
     /**
-     * Updates matter fields. If status changed, writes an activity
-     * log entry per US-B3 acceptance criteria and stamps closed_at
-     * when moving into the closed state.
+     * When status changes, stamps closed_at if transitioning to 'closed' and
+     * writes an activity log entry. The controller does not need to know this happened.
      */
     public function update(Matter $matter, array $data): Matter
     {
@@ -71,11 +66,6 @@ class MatterService
         return $matter;
     }
 
-    /**
-     * Assembles everything the matter workspace view needs across all
-     * tabs in a single call, per spec Section 15
-     * (GET /matters/{matter} response: matter, documents, tasks, research, timeline).
-     */
     public function getWorkspaceData(Matter $matter): array
     {
         $matter->load([
