@@ -16,12 +16,8 @@ class AnalyzeDocumentJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * No automatic retries - same reasoning as ExtractDocumentTextJob.
-     * A malformed Gemini response or API error won't fix itself on
-     * retry, and silently retrying could rack up API costs for a
-     * document that's fundamentally not going to parse.
-     */
+    // No retries — a bad Gemini response or API error won't resolve itself,
+    // and silent retries would rack up unnecessary API costs.
     public int $tries = 1;
 
     public function __construct(
@@ -59,6 +55,10 @@ class AnalyzeDocumentJob implements ShouldQueue
         }
     }
 
+    /**
+     * Catches hard crashes (e.g. OOM) that bypass the try/catch in handle(),
+     * preventing the document from being stuck on 'analyzing' indefinitely.
+     */
     public function failed(Throwable $e): void
     {
         $this->document->update([

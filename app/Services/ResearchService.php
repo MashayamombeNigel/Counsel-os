@@ -13,15 +13,8 @@ class ResearchService
     ) {}
 
     /**
-     * Assembles context from the matter summary plus every analyzed
-     * document's insight data - NOT raw extracted_text, which could
-     * push the prompt far too large across several documents. Insights
-     * are already the condensed representation; using them as context
-     * is the "dumb but working" retrieval strategy the spec calls for
-     * at MVP stage (Section 10: "Start MVP with simple context").
-     *
-     * Includes insights from ALL analyzed documents in the matter per
-     * your decision - no per-document selection UI.
+     * Builds context from analyzed document insights rather than raw extracted_text —
+     * insights are already condensed, preventing oversized prompts across multi-document matters.
      */
     public function buildMatterContext(Matter $matter): string
     {
@@ -76,12 +69,9 @@ class ResearchService
     }
 
     /**
-     * Runs synchronously per your decision - research answers are
-     * meant to feel conversational, and adding a queue+refresh step
-     * would undercut that. Gemini Flash's latency is acceptable for
-     * a single blocking request here, unlike full document analysis
-     * which can involve longer prompts and is less time-sensitive
-     * for the user waiting on it.
+     * Runs synchronously — research answers are conversational and a queue+poll loop
+     * would undercut the UX. Gemini Flash latency is acceptable for a single blocking
+     * request here, unlike document analysis which involves longer prompts.
      */
     public function answerQuestion(Matter $matter, string $question, int $userId): ResearchSession
     {

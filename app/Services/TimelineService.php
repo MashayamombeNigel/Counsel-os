@@ -9,13 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class TimelineService
 {
-    /**
-     * Records a matter-level event (created, status changed, etc).
-     * NOTE: if your Epic 0 stub already has this method with a
-     * different signature, reconcile the two rather than duplicating -
-     * this version is shown for completeness since MatterService
-     * depends on it.
-     */
     public function recordMatterEvent(Matter $matter, string $action, string $description): ActivityLog
     {
         return ActivityLog::create([
@@ -29,18 +22,9 @@ class TimelineService
     }
 
     /**
-     * Records a document-level event (uploaded, extracted, failed).
-     * Logged against the parent matter_id so it shows up in the
-     * matter workspace's Timeline tab alongside matter-level events,
-     * per spec Section 9 ("Timeline event created" after extraction).
-     *
-     * IMPORTANT: this is called both from HTTP request context
-     * (DocumentController::store, where Auth::id() works fine) and
-     * from inside ExtractDocumentTextJob running on the queue worker,
-     * where there is no authenticated session and Auth::id() would
-     * silently return null. Rather than let that null slip through,
-     * $userId defaults to the document's uploaded_by so queued job
-     * calls still attribute the log entry to a real user.
+     * Called from both HTTP context (DocumentController::store) and queued jobs
+     * (ExtractDocumentTextJob), where Auth::id() returns null. $userId defaults to
+     * $document->uploaded_by so queued calls still attribute the log to a real user.
      */
     public function recordDocumentEvent(Document $document, string $action, string $description, ?int $userId = null): ActivityLog
     {

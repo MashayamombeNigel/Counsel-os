@@ -17,10 +17,6 @@ class MatterController extends Controller
         protected MatterService $matters,
     ) {}
 
-    /**
-     * Route: GET /matters
-     * Query: status, client, search
-     */
     public function index(Request $request): View
     {
         return view('matters.index', [
@@ -37,8 +33,8 @@ class MatterController extends Controller
     }
 
     /**
-     * Create form pre-selects the client when arriving from a client
-     * profile page via ?client_id=, otherwise shows a client picker.
+     * Pre-selects the client when arriving from a client profile via ?client_id=,
+     * otherwise falls back to a full client picker.
      */
     public function create(Request $request): View
     {
@@ -59,13 +55,6 @@ class MatterController extends Controller
             ->with('status', 'Matter created.');
     }
 
-    /**
-     * Route: GET /matters/{matter}
-     * Response: matter, documents, tasks, research, timeline -
-     * the workspace shell. Tab content beyond Overview is built out
-     * in Epic 3/5; this ships the tab structure now so navigation
-     * works end to end from day one.
-     */
     public function show(Matter $matter): View
     {
         return view('matters.show', $this->matters->getWorkspaceData($matter));
@@ -76,11 +65,6 @@ class MatterController extends Controller
         return view('matters.edit', ['matter' => $matter]);
     }
 
-    /**
-     * Handles both field edits and status changes (US-B3). The
-     * service layer detects a status diff and writes the activity
-     * log entry - the controller doesn't need to know that happened.
-     */
     public function update(UpdateMatterRequest $request, Matter $matter): RedirectResponse
     {
         $this->matters->update($matter, $request->validated());

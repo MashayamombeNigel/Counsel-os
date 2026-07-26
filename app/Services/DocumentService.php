@@ -11,10 +11,9 @@ use Illuminate\Support\Facades\Storage;
 class DocumentService
 {
     /**
-     * Store an uploaded file to the private disk and create the
-     * document record. Uses a generated filename to avoid collisions
-     * and to avoid trusting user-supplied filenames as storage paths -
-     * the original name is kept separately for display only.
+     * Generates a UUID filename to avoid collisions and to prevent user-supplied
+     * filenames from being used as storage paths. The original name is stored
+     * separately for display only.
      */
     public function storeUpload(Matter $matter, UploadedFile $file, string $documentType, int $uploadedBy): Document
     {
@@ -24,7 +23,7 @@ class DocumentService
         $path = $file->storeAs(
             "matters/{$matter->id}/documents",
             $generatedName,
-            'local', // private disk - not publicly accessible, per spec Section 17
+            'local', // private disk — not publicly accessible
         );
 
         return Document::create([

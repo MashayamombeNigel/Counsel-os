@@ -16,11 +16,7 @@ class ExtractDocumentTextJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * No automatic retries - a malformed or scanned PDF won't parse
-     * differently on a second attempt. Better to fail fast and let
-     * the user see a clear error than retry silently in the background.
-     */
+    // No retries — a malformed or scanned PDF won't parse differently on a second attempt.
     public int $tries = 1;
 
     public function __construct(
@@ -63,10 +59,8 @@ class ExtractDocumentTextJob implements ShouldQueue
     }
 
     /**
-     * Safety net in case the job crashes hard (e.g. OOM) rather than
-     * throwing a catchable exception inside handle(). Without this,
-     * a hard crash would leave the document stuck on "extracting"
-     * forever with no error shown to the user.
+     * Catches hard crashes (e.g. OOM) that bypass the try/catch in handle(),
+     * preventing the document from being stuck on 'extracting' indefinitely.
      */
     public function failed(Throwable $e): void
     {

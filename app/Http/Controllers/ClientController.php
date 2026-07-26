@@ -16,10 +16,6 @@ class ClientController extends Controller
         protected ClientService $clients,
     ) {}
 
-    /**
-     * Route: GET /clients
-     * Query: search
-     */
     public function index(Request $request): View
     {
         return view('clients.index', [
@@ -42,10 +38,6 @@ class ClientController extends Controller
             ->with('status', 'Client created.');
     }
 
-    /**
-     * Route: GET /clients/{client}
-     * Response: client, matters, recent documents (US-B1).
-     */
     public function show(Client $client): View
     {
         return view('clients.show', $this->clients->getProfileData($client));

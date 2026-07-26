@@ -13,11 +13,8 @@ class MatterResearchPrompt
         PROMPT;
     }
 
-    /**
-     * $context is the pre-assembled matter summary + document insights
-     * string from ResearchService::buildMatterContext() - this class
-     * only formats the final prompt, it doesn't gather the context itself.
-     */
+    // $context is the pre-assembled string from ResearchService::buildMatterContext().
+    // This class only formats the final prompt — it does not gather context itself.
     public static function user(string $question, string $context): string
     {
         return <<<PROMPT

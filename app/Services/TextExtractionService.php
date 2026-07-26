@@ -10,13 +10,9 @@ use Smalot\PdfParser\Parser as PdfParser;
 class TextExtractionService
 {
     /**
-     * Extracts text based on the document's mime type. Throws on
-     * failure (caught by the caller) and throws a distinct exception
-     * when extraction "succeeds" but yields no usable text - a scanned
-     * or DRM'd PDF often parses without error but returns nothing
-     * useful, and that should be treated as a failure, not a silent
-     * pass-through to analysis_pending. OCR is explicitly out of
-     * scope per the spec, so this is a hard stop, not a retry path.
+     * Throws a distinct exception when extraction yields fewer than 20 characters —
+     * scanned or DRM-protected PDFs often parse without error but return nothing usable.
+     * OCR is out of scope, so this is treated as a hard failure, not a retry path.
      */
     public function extract(Document $document): string
     {
