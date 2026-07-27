@@ -19,6 +19,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+gemini_memory.md
 Homestead.json
 Homestead.yaml
 Thumbs.db
