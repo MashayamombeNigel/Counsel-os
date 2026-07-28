@@ -4,14 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TaskResource\Pages;
 use App\Models\Task;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -53,18 +53,18 @@ class TaskResource extends Resource
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'open' => 'gray',
+                        'open'        => 'gray',
                         'in_progress' => 'warning',
-                        'done' => 'success',
-                        default => 'gray',
+                        'done'        => 'success',
+                        default       => 'gray',
                     }),
                 TextColumn::make('priority')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'low' => 'gray',
+                        'low'    => 'gray',
                         'medium' => 'warning',
-                        'high' => 'danger',
-                        default => 'gray',
+                        'high'   => 'danger',
+                        default  => 'gray',
                     }),
             ])
             ->filters([
@@ -81,9 +81,9 @@ class TaskResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTasks::route('/'),
+            'index'  => Pages\ListTasks::route('/'),
             'create' => Pages\CreateTask::route('/create'),
-            'edit' => Pages\EditTask::route('/{record}/edit'),
+            'edit'   => Pages\EditTask::route('/{record}/edit'),
         ];
     }
 }

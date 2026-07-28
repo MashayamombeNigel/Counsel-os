@@ -5,9 +5,9 @@ namespace App\Filament\Resources\MatterResource\RelationManagers;
 use App\Jobs\AnalyzeDocumentJob;
 use App\Jobs\ExtractDocumentTextJob;
 use App\Models\Document;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -16,12 +16,6 @@ class DocumentsRelationManager extends RelationManager
     protected static string $relationship = 'documents';
 
     protected static ?string $recordTitleAttribute = 'original_name';
-
-    // No create/delete — documents belong to the upload workflow, not admin entry.
-    public function isReadOnly(): bool
-    {
-        return false; // keep retry actions enabled, just no create form
-    }
 
     public function table(Table $table): Table
     {
@@ -65,6 +59,8 @@ class DocumentsRelationManager extends RelationManager
                         AnalyzeDocumentJob::dispatch($record);
                         Notification::make()->title('Analysis retry queued')->success()->send();
                     }),
-            ]);
+            ])
+            ->headerActions([])
+            ->heading('Documents');
     }
 }
