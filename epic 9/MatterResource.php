@@ -3,14 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MatterResource\Pages;
-use App\Filament\Resources\MatterResource\RelationManagers\DocumentsRelationManager;
-use App\Filament\Resources\MatterResource\RelationManagers\TasksRelationManager;
 use App\Models\Matter;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -21,24 +19,9 @@ class MatterResource extends Resource
 {
     protected static ?string $model = Matter::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Practice Management';
+    protected static ?string $navigationIcon = 'heroicon-o-scale';
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-scale';
-
-    protected static ?string $recordTitleAttribute = 'title';
-
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['title', 'client.name', 'practice_area'];
-    }
-
-    public static function getGlobalSearchResultDetails($record): array
-    {
-        return [
-            'Client' => $record->client->name,
-            'Status' => ucfirst(str_replace('_', ' ', $record->status)),
-        ];
-    }
+    protected static ?string $navigationGroup = 'Practice Management';
 
     public static function form(Schema $schema): Schema
     {
@@ -51,10 +34,10 @@ class MatterResource extends Resource
             TextInput::make('practice_area')->maxLength(120),
             Select::make('status')
                 ->options([
-                    'open'           => 'Open',
-                    'in_review'      => 'In Review',
+                    'open' => 'Open',
+                    'in_review' => 'In Review',
                     'waiting_client' => 'Waiting Client',
-                    'closed'         => 'Closed',
+                    'closed' => 'Closed',
                 ])
                 ->required(),
             Textarea::make('description')->rows(3),
@@ -71,21 +54,21 @@ class MatterResource extends Resource
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'open'           => 'success',
-                        'in_review'      => 'warning',
+                        'open' => 'success',
+                        'in_review' => 'warning',
                         'waiting_client' => 'info',
-                        'closed'         => 'gray',
-                        default          => 'gray',
+                        'closed' => 'gray',
+                        default => 'gray',
                     }),
                 TextColumn::make('documents_count')->counts('documents')->label('Docs'),
                 TextColumn::make('tasks_count')->counts('tasks')->label('Tasks'),
             ])
             ->filters([
                 SelectFilter::make('status')->options([
-                    'open'           => 'Open',
-                    'in_review'      => 'In Review',
+                    'open' => 'Open',
+                    'in_review' => 'In Review',
                     'waiting_client' => 'Waiting Client',
-                    'closed'         => 'Closed',
+                    'closed' => 'Closed',
                 ]),
             ])
             ->actions([
@@ -95,20 +78,32 @@ class MatterResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'client.name', 'practice_area'];
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return ['Client' => $record->client->name, 'Status' => ucfirst(str_replace('_', ' ', $record->status))];
+    }
+
     public static function getRelations(): array
     {
         return [
-            DocumentsRelationManager::class,
-            TasksRelationManager::class,
+            \App\Filament\Resources\MatterResource\RelationManagers\DocumentsRelationManager::class,
+            \App\Filament\Resources\MatterResource\RelationManagers\TasksRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListMatters::route('/'),
+            'index' => Pages\ListMatters::route('/'),
             'create' => Pages\CreateMatter::route('/create'),
-            'edit'   => Pages\EditMatter::route('/{record}/edit'),
+            'edit' => Pages\EditMatter::route('/{record}/edit'),
         ];
     }
 }

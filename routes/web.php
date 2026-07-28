@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,7 +14,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/search', [\App\Http\Controllers\DashboardController::class, 'search'])->name('search');
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
 
     Route::patch('/clients/{client}/archive', [\App\Http\Controllers\ClientController::class, 'archive'])->name('clients.archive');
     Route::resource('clients', \App\Http\Controllers\ClientController::class);

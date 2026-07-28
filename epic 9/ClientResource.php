@@ -17,9 +17,9 @@ class ClientResource extends Resource
 {
     protected static ?string $model = Client::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Practice Management';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationGroup = 'Practice Management';
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -58,9 +58,9 @@ class ClientResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListClients::route('/'),
+            'index' => Pages\ListClients::route('/'),
             'create' => Pages\CreateClient::route('/create'),
-            'edit'   => Pages\EditClient::route('/{record}/edit'),
+            'edit' => Pages\EditClient::route('/{record}/edit'),
         ];
     }
 }
