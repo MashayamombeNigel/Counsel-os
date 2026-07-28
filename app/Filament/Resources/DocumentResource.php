@@ -26,10 +26,14 @@ class DocumentResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     // Documents are created through the attorney-facing upload flow, not here.
-    // This resource is for operational visibility and failure recovery only.
     public static function canCreate(): bool
     {
         return false;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['original_name', 'matter.title'];
     }
 
     public static function form(Schema $schema): Schema
@@ -37,12 +41,12 @@ class DocumentResource extends Resource
         return $schema->components([
             Select::make('document_type')
                 ->options([
-                    'contract' => 'Contract',
-                    'lease' => 'Lease',
-                    'title_deed' => 'Title Deed',
+                    'contract'       => 'Contract',
+                    'lease'          => 'Lease',
+                    'title_deed'     => 'Title Deed',
                     'correspondence' => 'Correspondence',
-                    'research' => 'Research',
-                    'other' => 'Other',
+                    'research'       => 'Research',
+                    'other'          => 'Other',
                 ])
                 ->required(),
             Textarea::make('error_message')->rows(3)->disabled(),
@@ -59,23 +63,23 @@ class DocumentResource extends Resource
                 TextColumn::make('processing_status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'uploaded' => 'gray',
-                        'extracting' => 'info',
+                        'uploaded'         => 'gray',
+                        'extracting'       => 'info',
                         'analysis_pending' => 'warning',
-                        'analyzed' => 'success',
-                        'failed' => 'danger',
-                        default => 'gray',
+                        'analyzed'         => 'success',
+                        'failed'           => 'danger',
+                        default            => 'gray',
                     }),
                 TextColumn::make('error_message')->limit(40)->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')->dateTime('M j, Y')->sortable(),
             ])
             ->filters([
                 SelectFilter::make('processing_status')->options([
-                    'uploaded' => 'Uploaded',
-                    'extracting' => 'Extracting',
+                    'uploaded'         => 'Uploaded',
+                    'extracting'       => 'Extracting',
                     'analysis_pending' => 'Analysis Pending',
-                    'analyzed' => 'Analyzed',
-                    'failed' => 'Failed',
+                    'analyzed'         => 'Analyzed',
+                    'failed'           => 'Failed',
                 ]),
             ])
             ->actions([
@@ -89,11 +93,7 @@ class DocumentResource extends Resource
                     ->action(function (Document $record) {
                         $record->update(['processing_status' => 'extracting', 'error_message' => null]);
                         ExtractDocumentTextJob::dispatch($record);
-
-                        Notification::make()
-                            ->title('Extraction retry queued')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Extraction retry queued')->success()->send();
                     }),
 
                 // Visible only when extraction succeeded but AI analysis failed.
@@ -106,11 +106,7 @@ class DocumentResource extends Resource
                     ->action(function (Document $record) {
                         $record->update(['error_message' => null]);
                         AnalyzeDocumentJob::dispatch($record);
-
-                        Notification::make()
-                            ->title('Analysis retry queued')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Analysis retry queued')->success()->send();
                     }),
 
                 DeleteAction::make(),
@@ -122,7 +118,7 @@ class DocumentResource extends Resource
     {
         return [
             'index' => Pages\ListDocuments::route('/'),
-            'edit' => Pages\EditDocument::route('/{record}/edit'),
+            'edit'  => Pages\EditDocument::route('/{record}/edit'),
         ];
     }
 }

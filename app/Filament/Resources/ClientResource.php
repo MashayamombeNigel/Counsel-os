@@ -21,6 +21,11 @@ class ClientResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'organization', 'email'];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -53,9 +58,9 @@ class ClientResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListClients::route('/'),
+            'index'  => Pages\ListClients::route('/'),
             'create' => Pages\CreateClient::route('/create'),
-            'edit' => Pages\EditClient::route('/{record}/edit'),
+            'edit'   => Pages\EditClient::route('/{record}/edit'),
         ];
     }
 }
