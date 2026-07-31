@@ -14,7 +14,9 @@
     {{-- Top nav --}}
     <nav class="bg-surface-container-lowest flex justify-between items-center w-full px-margin-x h-16 sticky top-0 z-50 shadow-sm border-b border-surface-variant">
         <div class="flex items-center gap-stack-md">
-            <span class="text-headline-md font-bold text-secondary">CounselOS</span>
+            <a href="{{ route('dashboard') }}">
+                <img src="{{ asset('images/logo/lockup-navy.png') }}" alt="CounselOS" class="h-7 w-auto object-contain">
+            </a>
             <div class="hidden md:flex ml-10 items-center gap-6">
                 <a href="{{ route('dashboard') }}"
                    class="text-body-md h-16 flex items-center {{ request()->routeIs('dashboard') ? 'text-secondary border-b-2 border-secondary' : 'text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200 px-2' }}">
@@ -42,11 +44,7 @@
     <aside class="fixed left-0 top-0 h-full flex-col pt-16 border-r border-surface-variant bg-surface w-64 hidden md:flex z-40">
         <div class="px-4 py-6 flex flex-col gap-2 overflow-y-auto flex-grow">
             <div class="flex items-center gap-3 mb-6 px-2">
-                <div class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-white font-black text-xl">C</div>
-                <div>
-                    <div class="text-label-md font-semibold text-primary">CounselOS</div>
-                    <div class="text-[10px] text-on-surface-variant uppercase tracking-wider">Matter Intelligence</div>
-                </div>
+                <img src="{{ asset('images/logo/lockup-navy.png') }}" alt="CounselOS" class="h-8 w-auto object-contain">
             </div>
 
             <a href="{{ route('matters.create') }}"

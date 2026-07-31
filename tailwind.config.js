@@ -21,7 +21,10 @@ export default {
                 "body-md": ["Inter"],
                 "headline-xl": ["Inter"],
                 "body-sm": ["Inter"],
-                "headline-lg": ["Inter"]
+                "headline-lg": ["Inter"],
+                headline: ['Plus Jakarta Sans', 'sans-serif'],
+                display: ['Plus Jakarta Sans', 'sans-serif'],
+                body: ['Inter', 'sans-serif'],
             },
             colors: {
                 "tertiary": "#1e1200",
@@ -70,7 +73,16 @@ export default {
                 "on-primary-fixed-variant": "#3c475a",
                 "tertiary-fixed-dim": "#ddc39d",
                 "on-background": "#191c1e",
-                "primary-fixed": "#d8e3fb"
+                "primary-fixed": "#d8e3fb",
+                
+                brand: {
+                    50: '#f5f3ff',
+                    100: '#ede9fe',
+                    200: '#ddd6fe',
+                    700: '#6d28d9',
+                    800: '#5b21b6',
+                    900: '#4c1d95',
+    },
             },
             borderRadius: {
                 "DEFAULT": "0.25rem",
