@@ -1,4 +1,11 @@
-# CounselOS
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/mark-white.png">
+    <img src="assets/mark-navy.png" width="72" alt="CounselOS logo">
+  </picture>
+</p>
+
+<h1 align="center">CounselOS</h1>
 
 **AI-powered legal matter intelligence platform.** Converts uploaded legal documents into structured, searchable insights — summaries, risks, obligations, and deadlines — inside a matter-scoped workspace built for small legal teams.
 
@@ -77,23 +84,9 @@ Legal Professional
 
 **Internal layering:**
 
-```
-routes/web.php
-    |
-    v
-Controllers -> Form Requests
-    |
-    v
-Services: ClientService, MatterService, DocumentService,
-          TextExtractionService, AiAnalysisService, GeminiClient,
-          ResearchService, TaskService, TimelineService, SearchService
-    |
-    v
-Models (Eloquent) -> PostgreSQL
-    |
-    +--> Storage facade -> private disk
-    +--> Jobs (queued): ExtractDocumentTextJob, AnalyzeDocumentJob
-```
+<p align="center">
+  <img src="assets/internal-layering.svg" alt="Internal layering: routes/web.php through Controllers, Form Requests, Services, Models/Eloquent, PostgreSQL, private storage, and queued jobs" width="640">
+</p>
 
 Controllers are intentionally thin — they validate, delegate to a service, and redirect. All business logic (status transitions, activity logging, AI orchestration) lives in the service layer, which is where the actual engineering decisions are visible.
 
