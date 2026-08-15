@@ -24,6 +24,7 @@ export default {
                 "headline-lg": ["Inter"],
                 headline: ['Plus Jakarta Sans', 'sans-serif'],
                 display: ['Plus Jakarta Sans', 'sans-serif'],
+                serif: ['Instrument Serif', 'Georgia', 'Times New Roman', 'serif'],
                 body: ['Inter', 'sans-serif'],
             },
             colors: {

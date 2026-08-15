@@ -13,19 +13,15 @@
 
     <style>
         .ai-accent-border { border-left: 4px solid #6d28d9; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            border: 1px solid #E2E8F0;
-        }
         .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .hover-lift:hover {
             transform: translateY(-4px);
             box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.05);
         }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-[#f7f9fb] text-[#191c1e] antialiased font-body selection:bg-[#ddd6fe]" x-data="{ isModalOpen: false }">
+<body class="bg-[#f6f4f1] text-[#141414] antialiased font-body selection:bg-[#e8e4de]" x-data="{ isModalOpen: false }">
 
     @include('partials.landing.nav')
     @include('partials.landing.hero')
